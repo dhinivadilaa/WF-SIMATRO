@@ -4,50 +4,66 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\User;
+use App\Models\Admin; // ganti User → Admin
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    // Register (public)
+    // Register Admin (public)
     public function register(Request $req)
     {
         $req->validate([
-            'name'=>'required|string',
-            'email'=>'required|email|unique:users',
-            'password'=>'required|min:6'
+            'name' => 'required|string',
+            'email' => 'required|email|unique:admin,email',
+            'password' => 'required|min:6'
         ]);
 
-        $user = User::create([
-            'name'=>$req->name,
-            'email'=>$req->email,
-            'password'=>Hash::make($req->password)
+        $admin = Admin::create([
+            'name' => $req->name,
+            'email' => $req->email,
+            'password' => Hash::make($req->password)
         ]);
 
-        $token = $user->createToken('simatro-token')->plainTextToken;
+        $token = $admin->createToken('simatro-token')->plainTextToken;
 
-        return response()->json(['message'=>'Register sukses','user'=>$user,'token'=>$token],201);
+        return response()->json([
+            'message' => 'Register sukses',
+            'admin' => $admin,
+            'token' => $token
+        ], 201);
     }
 
-    // Login (public)
+    // Login Admin (public)
     public function login(Request $req)
     {
-        $req->validate(['email'=>'required|email','password'=>'required']);
+        $req->validate([
+            'email' => 'required|email',
+            'password' => 'required'
+        ]);
 
-        $user = User::where('email',$req->email)->first();
-        if (! $user || ! Hash::check($req->password, $user->password)) {
-            throw ValidationException::withMessages(['email' => ['Credentials are incorrect.']]);
+        $admin = Admin::where('email', $req->email)->first();
+
+        if (! $admin || ! Hash::check($req->password, $admin->password)) {
+            throw ValidationException::withMessages([
+                'email' => ['Email atau password salah.']
+            ]);
         }
 
-        $token = $user->createToken('simatro-token')->plainTextToken;
-        return response()->json(['message'=>'Login sukses','user'=>$user,'token'=>$token]);
+        $token = $admin->createToken('simatro-token')->plainTextToken;
+
+        return response()->json([
+            'message' => 'Login sukses',
+            'admin' => $admin,
+            'token' => $token
+        ]);
     }
 
     // Logout (protected)
     public function logout(Request $req)
     {
         $req->user()->tokens()->delete();
-        return response()->json(['message'=>'Logout berhasil']);
+
+        return response()->json(['message' => 'Logout berhasil']);
     }
 }

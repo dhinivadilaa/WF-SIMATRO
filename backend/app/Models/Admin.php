@@ -7,12 +7,17 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+class Admin extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
-     * Field yang boleh diisi (mass assignable)
+     * Tentukan nama tabel admin
+     */
+    protected $table = 'admin'; // PENTING!
+
+    /**
+     * Field yang boleh diisi.
      */
     protected $fillable = [
         'name',
@@ -21,7 +26,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * Field yang akan disembunyikan.
+     * Field yang disembunyikan.
      */
     protected $hidden = [
         'password',
@@ -37,25 +42,19 @@ class User extends Authenticatable
 
     /**
      * ================================
-     *          RELATIONS
+     *             RELATIONS
      * ================================
      */
 
-    // Relasi ke absensi
-    public function attendances()
+    // Admin dapat membuat banyak event
+    public function eventsCreated()
     {
-        return $this->hasMany(Attendance::class);
+        return $this->hasMany(Event::class, 'created_by');
     }
 
-    // Relasi ke sertifikat
-    public function certificates()
+    // Admin dapat membuat sertifikat (opsional digunakan)
+    public function certificatesGenerated()
     {
-        return $this->hasMany(Certificate::class);
-    }
-
-    // Relasi ke feedback
-    public function feedbacks()
-    {
-        return $this->hasMany(Feedback::class);
+        return $this->hasMany(Certificate::class, 'generated_by');
     }
 }

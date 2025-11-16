@@ -10,13 +10,27 @@ return new class extends Migration
     {
         Schema::create('events', function (Blueprint $table) {
             $table->id();
-            $table->string('title');               // Judul acara
-            $table->text('description')->nullable(); // Deskripsi acara
-            $table->string('speaker')->nullable();   // Pemateri
-            $table->dateTime('start_time');        // Waktu mulai
-            $table->dateTime('end_time')->nullable(); // Waktu selesai
-            $table->string('location')->nullable();  // Tempat acara
-            $table->string('banner')->nullable();    // Gambar/banner acara
+
+            $table->string('title');                 
+            $table->text('description')->nullable();
+            $table->string('speaker')->nullable();
+            $table->dateTime('start_time');
+            $table->dateTime('end_time')->nullable();
+            $table->string('location')->nullable();
+            $table->string('banner')->nullable();
+
+            // 👉 Tambahan penting untuk absensi
+            $table->string('pin_code', 6)->nullable()
+                  ->comment('PIN absensi yang dibuat panitia, hanya aktif saat acara berlangsung');
+
+            // (opsional)
+            $table->integer('max_participants')->nullable()
+                  ->comment('Batas maksimal peserta, opsional');
+
+            // (opsional)
+            $table->boolean('is_active')->default(true)
+                  ->comment('Status event, true = aktif');
+
             $table->timestamps();
         });
     }

@@ -11,20 +11,13 @@ return new class extends Migration
         Schema::create('participants', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('event_id')
-                ->constrained('events')
-                ->cascadeOnDelete(); 
-            // Jika event dihapus → pesertanya ikut terhapus
+            // ❌ HAPUS event_id — peserta bisa ikut banyak event
+            // ❌ HAPUS pin — PIN milik event, bukan peserta
+            // ❌ HAPUS is_verified — peserta TIDAK login
 
             $table->string('name');
-            $table->string('email')->index();
+            $table->string('email')->unique();
             $table->string('phone')->nullable();
-
-            $table->string('pin')->unique(); 
-            // PIN digunakan untuk absensi dan generate sertifikat
-
-            $table->boolean('is_verified')->default(false);
-            // Untuk menandai jika email sudah diverifikasi (opsional)
 
             $table->timestamps();
         });
